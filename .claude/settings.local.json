@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:news.qq.com)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
