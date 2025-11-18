@@ -1,0 +1,8 @@
+[project]
+name = "podcast-writer"
+version = "0.1.0"
+description = "Podcast writer and audio generator"
+requires-python = ">=3.12"
+dependencies = [
+    "requests",
+]
