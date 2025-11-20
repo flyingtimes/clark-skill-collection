@@ -124,6 +124,9 @@ async def process_single_article(page, action, index: int) -> bool:
 
     except Exception as e:
         logger.error(f"处理第 {index + 1} 篇文章时发生错误: {e}")
+        root_dir = os.getenv("root_dir")
+        full_path = os.path.join(root_dir, "logs")
+        page.screenshot(path=f"{clean_title}.png", full_page=True)
         await safe_navigate_back(page)
         return False
 
@@ -140,7 +143,7 @@ async def initialize_stagehand() -> Stagehand:
 
     config = StagehandConfig(
         env="LOCAL",
-        model_name="openai/glm-4.6",
+        model_name="openai/glm-4.5v",
         model_api_key=api_key,
         model_api_base=api_base,
         local_browser_launch_options={"cdp_url": "http://localhost:9222"}
