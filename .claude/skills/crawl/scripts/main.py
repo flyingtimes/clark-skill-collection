@@ -14,12 +14,44 @@ from dotenv import load_dotenv
 from stagehand import Stagehand, StagehandConfig
 from pydantic import BaseModel, Field
 
-# 配置日志
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+def setup_logging():
+    """设置日志配置，将日志写入到root_dir/logs文件夹"""
+    # 确保先加载环境变量
+    load_dotenv()
+
+    root_dir = os.getenv('root_dir')
+    if not root_dir:
+        root_dir = os.getcwd()  # 如果没有设置root_dir，使用当前目录
+
+    # 创建logs目录
+    log_dir = os.path.join(root_dir, 'logs')
+    os.makedirs(log_dir, exist_ok=True)
+
+    # 设置日志文件名（按日期）
+    from datetime import datetime
+    log_filename = f"crawl_{datetime.now().strftime('%Y%m%d')}.log"
+    log_filepath = os.path.join(log_dir, log_filename)
+
+    # 清除已有的处理器以避免重复
+    for handler in logging.root.handlers[:]:
+        logging.root.removeHandler(handler)
+
+    # 配置日志格式
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler(log_filepath, encoding='utf-8'),
+            logging.StreamHandler()  # 同时输出到控制台
+        ]
+    )
+
+    logger = logging.getLogger('crawl_skill')
+    logger.info(f"日志系统初始化完成，日志文件路径: {log_filepath}")
+    return logger
+
+# 初始化日志
+logger = setup_logging()
 
 class EssayInfo(BaseModel):
     title: str = Field(..., description="标题")
@@ -67,26 +99,22 @@ async def process_single_article(page, action, index: int) -> bool:
     """处理单篇文章"""
     try:
         logger.info(f"处理第 {index + 1} 篇文章: {action.description}")
-        print(action.description)
 
         await page.act(action)
         await page.wait_for_load_state("domcontentloaded")
 
         try:
             result = await page.extract(
-                "提取文章的标题、副标题、作者名字、正文内容，请注意不要包含广告内容",
+                "提取文章的标题、副标题、作者名字、完整的正文内容，请注意正文可能被广告打断，请不要包含广告内容，而是获取整个页面中完整的文章正文内容",
                 schema=EssayInfo
             )
+            logger.info(result)
         except Exception as e:
             logger.error(f"文章内容提取失败: {e}")
             await safe_navigate_back(page)
             return False
 
-        print("=" * 20)
-        print(result)
-        print("=" * 20)
-
-        clean_title = sanitize_filename(result.title, index)
+        clean_title = sanitize_filename(action.description, index)
         filename = f"output/{clean_title}.txt"
         save_article(result.content, filename)
         print(f"文章已保存到: {filename}")
@@ -112,7 +140,7 @@ async def initialize_stagehand() -> Stagehand:
 
     config = StagehandConfig(
         env="LOCAL",
-        model_name="openai/glm-4.5v",
+        model_name="openai/glm-4.6",
         model_api_key=api_key,
         model_api_base=api_base,
         local_browser_launch_options={"cdp_url": "http://localhost:9222"}

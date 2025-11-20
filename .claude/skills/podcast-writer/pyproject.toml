@@ -5,4 +5,5 @@ description = "Podcast writer and audio generator"
 requires-python = ">=3.12"
 dependencies = [
     "requests",
+    "python-dotenv",
 ]

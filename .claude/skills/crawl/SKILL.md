@@ -14,7 +14,7 @@ description: 这个技能接收用户的需求，抓取theatlantic.com的文章
 # 功能要求
 首先检查运行环境是否就绪
 ```bash
-cd scripts ; uv sync
+cd scripts ; uv run check_and_run_uv.py
 ```
 使用下面示例调用处理程序，并获取结果
 ```bash

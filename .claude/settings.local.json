@@ -1,13 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:news.qq.com)"
+      "WebFetch(domain:news.qq.com)",
+      "Skill(crawl)"
     ],
     "deny": [],
     "ask": []
   },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "chrome-devtools"
-  ],
-  "enableAllProjectMcpServers": true
+  ]
 }
