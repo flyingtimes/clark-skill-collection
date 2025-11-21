@@ -224,7 +224,7 @@ async def process_single_article(page, action, index: int) -> bool:
             return False
 
         # 将文章标题转换为合法的文件名
-        clean_title = sanitize_filename(action.description, index)
+        clean_title = sanitize_filename(result.title, index)
 
         # 构建输出文件路径，保存在 output 目录下
         filename = f"output/{clean_title}.txt"
