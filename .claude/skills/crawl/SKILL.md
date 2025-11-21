@@ -20,3 +20,4 @@ cd scripts ; uv run check_and_run_uv.py
 ```bash
 cd scripts ; uv run main.py
 ```
+处理程序会执行很长时间，请一直保持等待知道程序执行完毕。务必不要中断程序的执行。

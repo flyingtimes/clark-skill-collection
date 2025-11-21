@@ -41,7 +41,7 @@ def start_chrome_debug():
             "--disable-popup-blocking",
             "--proxy-server=http://127.0.0.1:1087",
             f"--user-data-dir={userdata_dir}",
-            "--headless=new"
+            #"--headless=new"
         ]
     else:  # Mac环境
         chrome_path = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"

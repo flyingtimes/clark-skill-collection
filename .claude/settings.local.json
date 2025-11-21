@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "WebFetch(domain:news.qq.com)",
-      "Skill(crawl)"
+      "Skill(crawl)",
+      "Skill(translate)",
+      "Bash(uv run:*)"
     ],
     "deny": [],
     "ask": []
