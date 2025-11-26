@@ -210,6 +210,9 @@ async def process_single_article(page, action, index: int) -> bool:
         await page.wait_for_load_state("domcontentloaded")
 
         # 尝试从页面中提取结构化文章信息
+        # 这部分太消耗token了，采用直接保存页面内容的方式
+        result = await page.content()
+        """
         try:
             # 使用 AI 模型提取文章信息，按照 EssayInfo 模型结构化
             # 提示中明确要求排除广告内容，确保获取纯净的文章正文
@@ -222,6 +225,7 @@ async def process_single_article(page, action, index: int) -> bool:
             # 内容提取失败的错误处理
             logger.error(f"文章内容提取失败: {e}")
             return False
+        """
 
         # 将文章标题转换为合法的文件名
         clean_title = sanitize_filename(action.description, index)
@@ -230,7 +234,7 @@ async def process_single_article(page, action, index: int) -> bool:
         filename = f"output/{clean_title}.txt"
 
         # 保存文章正文内容到文件
-        save_article(result.content, filename)
+        save_article(result, filename)
 
         # 在控制台显示保存结果，提供用户反馈
         print(f"文章已保存到: {filename}")
@@ -293,7 +297,7 @@ async def initialize_stagehand() -> Stagehand:
     # 配置 Stagehand 的各种参数
     config = StagehandConfig(
         env="LOCAL",  # 运行环境：本地模式
-        model_name="openai/glm-4.5v",  # 使用智谱AI的GLM-4.5V模型（支持多模态理解）
+        model_name="openai/glm-4.6",  # 使用智谱AI的GLM-4.5V模型（支持多模态理解）
         model_api_key=api_key,  # API密钥
         model_api_base=api_base,  # API基础URL
         # 本地浏览器启动选项：通过Chrome DevTools Protocol连接到已启动的Chrome实例
@@ -346,11 +350,13 @@ async def main():
         # 导航到 The Atlantic 网站的最新文章页面
         logging.info("开始新的抓取任务")
         await page.goto("https://www.theatlantic.com/latest")
-        # 等待页面加载完毕
-        await page.wait_for_load_state("domcontentloaded")
+        # 等待页面加载完毕并稳定
+        await page.wait_for_load_state("networkidle")
+        # 额外等待几秒确保页面完全加载
+        await asyncio.sleep(3)
         page_content = await page.content()
         logging.info("showing page content")
-        logging.info(page_content)
+        logging.info(page_content[:1000] + "...")  # 只记录前1000个字符避免日志过长
         login_flag = await page.observe("find href:My Account")
         logging.info("获取登录状态")
         logging.info(login_flag)
@@ -360,12 +366,13 @@ async def main():
         logging.info("网站已登录")
         # 使用 Stagehand 的 AI 观察功能，自动识别并获取页面上的文章链接
         # observe 方法会分析页面结构并返回可执行的动作列表
-        actions = await page.observe("获取最近一天的所有文章标题和链接")
+        actions = await page.observe("获取最近一天的所有文章链接，返回可以点击的文章标题")
 
         # 记录获取到的文章数量，用于监控程序进度
         logger.info(f"获取到 {len(actions)} 个文章链接")
         logger.info(actions)
         # 遍历所有文章链接，逐一进行处理
+        # TODO: 实时统计文章处理的成功率
         for i, action in enumerate(actions):
             # 处理单篇文章，传入页面对象、动作对象和文章索引
             success = await process_single_article(page, action, i)
