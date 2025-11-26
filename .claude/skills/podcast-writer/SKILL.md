@@ -20,10 +20,15 @@ allowed-tools: Read, Grep, Glob, Write, Search
 "新技术"对应的提示词模版为: [TECH.md](TECH.md)
 "其他"对应的提示词模版为: [OTHER.md](OTHER.md)
 5、为这个内容生成一个合适的标题{title}
-6、根据给出的提示词模版和输入{input},直接生成podcast直播口述稿，并写入当前项目目录下的/output/{title}_{currentdate_currenttime}.txt
+
+## 文本输出
+
+6、根据给出的提示词模版和输入{input},直接生成podcast直播口述稿，并写入当前项目目录下的output/{title}_{currentdate_currenttime}.txt
 7、将{input}单独写入当前项目目录下的/output/{title}_{currentdate_currenttime}_original.txt
 8、第6步生成的文件内容还是很拗口，请将其改成更口语化的表达，除了口述稿正文内容，不要添加其他任何标题、旁白、解释,并将结果写入当前项目目录下的/output/{title}_{currentdate_currenttime}_final.txt
-9、生成音频文件。
+
+## 生成音频文件
+
 运行帮助脚本runninghub_api.py,使用当前项目目录下的/output/{title}_{currentdate_currenttime}_final.txt 作为input.txt,使用当前项目目录下的/output/{title}_{currentdate_currenttime}_final.flac 作为output.flac
 ```
 # 使用指定文本文件和指定输出路径
