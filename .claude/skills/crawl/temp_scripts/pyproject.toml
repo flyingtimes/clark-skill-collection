@@ -1,0 +1,11 @@
+[project]
+name = "extract_articles"
+version = "0.1.0"
+description = "Extract article content from HTML files"
+dependencies = [
+    "beautifulsoup4",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

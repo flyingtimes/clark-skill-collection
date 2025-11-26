@@ -231,7 +231,7 @@ async def process_single_article(page, action, index: int) -> bool:
         clean_title = sanitize_filename(action.description, index)
 
         # 构建输出文件路径，保存在 output 目录下
-        filename = f"output/{clean_title}.txt"
+        filename = f"output/html/{clean_title}.txt"
 
         # 保存文章正文内容到文件
         save_article(result, filename)
@@ -292,7 +292,9 @@ async def initialize_stagehand() -> Stagehand:
 
     # 创建输出目录，用于存储抓取的文章文件
     # exist_ok=True 避免目录已存在时报错
-    os.makedirs("output", exist_ok=True)
+    root_dir = os.getenv('root_dir')
+    full_path = os.path.join(root_dir, "output/html")
+    os.makedirs("output/html", exist_ok=True)
 
     # 配置 Stagehand 的各种参数
     config = StagehandConfig(
@@ -351,9 +353,8 @@ async def main():
         logging.info("开始新的抓取任务")
         await page.goto("https://www.theatlantic.com/latest")
         # 等待页面加载完毕并稳定
-        await page.wait_for_load_state("networkidle")
-        # 额外等待几秒确保页面完全加载
-        await asyncio.sleep(3)
+        await page.wait_for_load_state("domcontentloaded")
+
         page_content = await page.content()
         logging.info("showing page content")
         logging.info(page_content[:1000] + "...")  # 只记录前1000个字符避免日志过长

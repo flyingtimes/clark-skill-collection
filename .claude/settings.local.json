@@ -4,7 +4,8 @@
       "WebFetch(domain:news.qq.com)",
       "Skill(crawl)",
       "Skill(translate)",
-      "Bash(uv run:*)"
+      "Bash(uv run:*)",
+      "Bash(python3:*)"
     ],
     "deny": [],
     "ask": []
