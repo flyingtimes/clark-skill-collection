@@ -5,7 +5,10 @@
       "Skill(crawl)",
       "Skill(translate)",
       "Bash(uv run:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(python:*)",
+      "Bash(mkdir:*)",
+      "Bash(echo:*)"
     ],
     "deny": [],
     "ask": []

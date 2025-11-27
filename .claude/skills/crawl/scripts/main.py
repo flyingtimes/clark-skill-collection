@@ -331,6 +331,9 @@ async def process_single_article(page, action, index: int) -> bool:
         await page.wait_for_load_state("domcontentloaded")
 
         # 尝试从页面中提取结构化文章信息
+        # 这部分太消耗token了，采用直接保存页面内容的方式
+        result = await page.content()
+        """
         try:
             # 使用 AI 模型提取文章信息，按照 EssayInfo 模型结构化
             # 提示中明确要求排除广告内容，确保获取纯净的文章正文
@@ -343,20 +346,21 @@ async def process_single_article(page, action, index: int) -> bool:
             # 内容提取失败的错误处理
             logger.error(f"文章内容提取失败: {e}")
             return False
-        if result.content and len(result.content)>200:
-            # 将文章标题转换为合法的文件名
-            clean_title = sanitize_filename(result.title, index)
+        """
+        root_dir = os.getenv('root_dir')
+        full_path = os.path.join(root_dir, "output/html")
+        os.makedirs(full_path, exist_ok=True)
+        # 将文章标题转换为合法的文件名
+        clean_title = sanitize_filename(action.title, index)
+        filename = os.path.join(full_path, f"{clean_title}.txt")
 
-            # 构建输出文件路径，保存在 output/html 目录下
-            filename = f"output/html/{clean_title}.txt"
+        # 保存文章正文内容到文件
+        save_article(result, filename)
 
-            # 保存文章正文内容到文件
-            save_article(result.content, filename)
+        # 在控制台显示保存结果，提供用户反馈
+        print(f"文章已保存到: {filename}")
 
-            # 在控制台显示保存结果，提供用户反馈
-            print(f"文章已保存到: {filename}")
-
-            return True
+        return True
         logger.error(f"无法正常提取第 {index + 1} 篇文章内容")
         return False
 
@@ -491,7 +495,7 @@ async def main():
         logger.info(results)
         # 记录获取到的文章数量，用于监控程序进度
         logger.info(f"获取到 {len(results.list_of_EssayUrl)} 个文章链接")
-        
+
         # 遍历所有文章链接，逐一进行处理
         for i, action in enumerate(results.list_of_EssayUrl):
             # 处理单篇文章，传入页面对象、动作对象和文章索引
