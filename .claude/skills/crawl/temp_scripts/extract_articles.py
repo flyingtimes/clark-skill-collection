@@ -92,7 +92,7 @@ def extract_article_content(html_file_path):
             'status': f'error: {str(e)}'
         }
 
-def save_extracted_content(article_data, output_dir='output/extracted_articles'):
+def save_extracted_content(article_data, output_dir='output/articles'):
     """
     将提取的文章内容保存到文件
 
@@ -122,9 +122,12 @@ def save_extracted_content(article_data, output_dir='output/extracted_articles')
 def main():
     """主函数"""
     print("开始提取文章内容...")
-
+    root_dir = os.getenv("root_dir")
+    full_path = os.path.join(root_dir, "output/articles")
+    os.makedirs(full_path, exist_ok=True)
+    html_path = os.path.join(root_dir, "output/html/*.txt")
     # 查找所有文章文件
-    article_files = glob.glob('output/Article_title_*.txt')
+    article_files = glob.glob(html_path)
 
     if not article_files:
         print("未找到文章文件!")
@@ -144,7 +147,7 @@ def main():
 
         # 保存提取的内容
         if article_data['content']:
-            saved_path = save_extracted_content(article_data)
+            saved_path = save_extracted_content(article_data, output_dir=os.path.join(root_dir, "output/extracted_articles"))
             print(f"  [成功] 内容已保存到: {saved_path}")
             success_count += 1
         else:

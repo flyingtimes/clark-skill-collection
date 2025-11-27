@@ -9,4 +9,4 @@ dependencies = [
 ]
 
 [tool.uv.workspace]
-members = [".claude/skills/vision", ".claude/skills/crawl/scripts", ".claude/skills/zhipu-search", ".claude/skills/podcast-writer"]
+members = [".claude/skills/vision", ".claude/skills/crawl/scripts",".claude/skills/crawl/temp_scripts", ".claude/skills/zhipu-search", ".claude/skills/podcast-writer"]
